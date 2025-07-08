@@ -4,6 +4,8 @@
     --accent-color: #c06c84;
     --dark-color: #6c5b7b;
     --light-color: #f8f1f5;
+    --error-color: #ff6b6b;
+    --success-color: #51cf66;
 }
 
 * {
@@ -43,6 +45,7 @@ h1 {
     display: flex;
     margin-bottom: 20px;
     border-bottom: 2px solid var(--light-color);
+    overflow-x: auto;
 }
 
 .tab-btn {
@@ -54,6 +57,7 @@ h1 {
     font-weight: bold;
     color: var(--dark-color);
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .tab-btn.active {
@@ -99,10 +103,16 @@ button {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+    margin: 5px 0;
 }
 
 button:hover {
     background-color: var(--secondary-color);
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
 }
 
 #qr-code {
@@ -140,6 +150,14 @@ button:hover {
 #scanner-video {
     background: black;
     margin-bottom: 10px;
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+#scanner-status {
+    margin: 10px 0;
+    font-style: italic;
+    color: var(--dark-color);
 }
 
 .reward {
@@ -156,10 +174,16 @@ button:hover {
     display: flex;
     margin-bottom: 20px;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 #search-customers {
     flex: 1;
+    min-width: 200px;
+}
+
+.table-container {
+    overflow-x: auto;
 }
 
 table {
@@ -177,31 +201,64 @@ th, td {
 th {
     background-color: var(--primary-color);
     color: white;
+    position: sticky;
+    top: 0;
 }
 
 tr:hover {
     background-color: #f5f5f5;
 }
 
+.loading {
+    color: var(--dark-color);
+    font-style: italic;
+}
+
+.error {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
+.success {
+    color: var(--success-color);
+}
+
+/* Mobile Styles */
 @media (max-width: 768px) {
     .container {
         padding: 10px;
+        width: 95%;
     }
     
     .tabs {
-        flex-direction: column;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .tab-btn {
-        text-align: left;
-        border-bottom: 1px solid #ddd;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    #qr-code {
+        width: 150px;
+        height: 150px;
     }
     
     .search-container {
         flex-direction: column;
     }
     
-    #export-data {
+    #search-customers, #export-data, #clear-data {
         width: 100%;
+    }
+    
+    table {
+        font-size: 14px;
+    }
+    
+    td, th {
+        padding: 8px;
     }
 }
