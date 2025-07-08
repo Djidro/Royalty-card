@@ -24,7 +24,7 @@
             <form id="registration-form">
                 <div class="form-group">
                     <label for="phone">Phone Number:</label>
-                    <input type="tel" id="phone" required placeholder="e.g., 1234567890">
+                    <input type="tel" id="phone" required placeholder="e.g., 1234567890" pattern="[0-9]{10,15}">
                 </div>
                 <div class="form-group">
                     <label for="name">Full Name:</label>
@@ -51,11 +51,12 @@
             <h2>Scan Customer QR Code</h2>
             <div class="scanner-container">
                 <div id="scanner">
-                    <video id="scanner-video" width="300" height="300"></video>
+                    <video id="scanner-video" width="300" height="300" playsinline></video>
                     <canvas id="scanner-canvas" class="hidden"></canvas>
                 </div>
                 <button id="start-scan">Start Scanner</button>
                 <button id="stop-scan" class="hidden">Stop Scanner</button>
+                <div id="scanner-status">Camera not active</div>
             </div>
             
             <div id="scan-result" class="hidden">
@@ -78,22 +79,25 @@
             <h2>Customer Database</h2>
             <div class="search-container">
                 <input type="text" id="search-customers" placeholder="Search by name or phone...">
-                <button id="export-data">Export to Google Sheets</button>
+                <button id="export-data">Export Data</button>
+                <button id="clear-data">Clear All Data</button>
             </div>
-            <table id="customers-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Points</th>
-                        <th>Last Visit</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Customer data will be inserted here -->
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table id="customers-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Points</th>
+                            <th>Last Visit</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Customer data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
