@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakery Loyalty Program</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🍪 Bakery Loyalty Program</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="register">Register</button>
+            <button class="tab-btn" data-tab="scan">Scan QR</button>
+            <button class="tab-btn" data-tab="customers">Customers</button>
+        </div>
+        
+        <!-- Registration Tab -->
+        <div id="register" class="tab-content active">
+            <h2>Customer Registration</h2>
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" required placeholder="e.g., 1234567890">
+                </div>
+                <div class="form-group">
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" required placeholder="e.g., John Doe">
+                </div>
+                <button type="submit">Generate QR Code</button>
+            </form>
+            
+            <div id="qr-result" class="hidden">
+                <h3>Customer QR Code</h3>
+                <div id="qr-code"></div>
+                <p>Scan this QR code at checkout to earn points!</p>
+                <button id="download-qr">Download QR Code</button>
+                <div class="customer-info">
+                    <p><strong>Name:</strong> <span id="display-name"></span></p>
+                    <p><strong>Phone:</strong> <span id="display-phone"></span></p>
+                    <p><strong>Points:</strong> <span id="display-points">0</span>/10</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scan Tab -->
+        <div id="scan" class="tab-content">
+            <h2>Scan Customer QR Code</h2>
+            <div class="scanner-container">
+                <div id="scanner">
+                    <video id="scanner-video" width="300" height="300"></video>
+                    <canvas id="scanner-canvas" class="hidden"></canvas>
+                </div>
+                <button id="start-scan">Start Scanner</button>
+                <button id="stop-scan" class="hidden">Stop Scanner</button>
+            </div>
+            
+            <div id="scan-result" class="hidden">
+                <h3>Customer Found</h3>
+                <div class="customer-info">
+                    <p><strong>Name:</strong> <span id="scan-name"></span></p>
+                    <p><strong>Phone:</strong> <span id="scan-phone"></span></p>
+                    <p><strong>Points:</strong> <span id="scan-points"></span>/10</p>
+                    <p><strong>Last Visit:</strong> <span id="scan-last-visit"></span></p>
+                </div>
+                <button id="add-point">Add Point</button>
+                <div id="reward-message" class="hidden reward">
+                    🎉 Customer earned a free item! Points reset to 0.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customers Tab -->
+        <div id="customers" class="tab-content">
+            <h2>Customer Database</h2>
+            <div class="search-container">
+                <input type="text" id="search-customers" placeholder="Search by name or phone...">
+                <button id="export-data">Export to Google Sheets</button>
+            </div>
+            <table id="customers-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Points</th>
+                        <th>Last Visit</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Customer data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
