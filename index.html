@@ -1,106 +1,181 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakery Loyalty Program</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: blob:; connect-src 'self' https://cdnjs.cloudflare.com">
+    <title>Royal Bakes POS</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e67e22">
+    <link rel="stylesheet" href="style.css">
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Fallback for offline -->
+    <noscript>
+        <link rel="stylesheet" href="css/font-awesome-fallback.css">
+    </noscript>
 </head>
+
+<script>
+    // Check if user is authenticated with PIN
+    if (!localStorage.getItem('pinAuthenticated')) {
+        window.location.href = 'pin.html';
+    }
+</script>
 <body>
+    <!-- [Rest of your existing HTML body content remains exactly the same] -->
+</body>
+</html>
     <div class="container">
-        <h1>🍪 Bakery Loyalty Program</h1>
-        
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="register">Register</button>
-            <button class="tab-btn" data-tab="scan">Scan QR</button>
-            <button class="tab-btn" data-tab="customers">Customers</button>
-        </div>
-        
-        <!-- Registration Tab -->
-        <div id="register" class="tab-content active">
-            <h2>Customer Registration</h2>
-            <form id="registration-form">
-                <div class="form-group">
-                    <label for="phone">Phone Number:</label>
-                    <input type="tel" id="phone" required placeholder="e.g., 1234567890" pattern="[0-9]{10,15}">
+        <header>
+    <div id="shift-status" class="shift-off">Shift: Not Started</div>
+        </header>
+
+      <nav>
+    <button class="tab-btn active" data-tab="pos"><i class="fas fa-cash-register"></i> POS</button>
+    <button class="tab-btn" data-tab="receipts"><i class="fas fa-receipt"></i> Receipts</button>
+    <button class="tab-btn" data-tab="summary"><i class="fas fa-chart-bar"></i> Summary</button>
+
+<button id="logout-btn" style="margin-left: 15px; padding: 8px 15px; background: var(--danger-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+    <i class="fas fa-sign-out-alt"></i> Logout
+</button>
+    <button class="tab-btn" data-tab="stock"><i class="fas fa-boxes"></i> Stock</button>
+    <button class="tab-btn" data-tab="expenses"><i class="fas fa-receipt"></i> Expenses</button>
+    <button class="tab-btn" data-tab="shift"><i class="fas fa-user-clock"></i> Shift</button>
+</nav>
+  <main>
+            <!-- POS Tab -->
+            <div id="pos" class="tab-content active">
+                <div class="products-grid" id="products-grid">
+                    <!-- Products will be loaded here -->
                 </div>
-                <div class="form-group">
-                    <label for="name">Full Name:</label>
-                    <input type="text" id="name" required placeholder="e.g., John Doe">
-                </div>
-                <button type="submit">Generate QR Code</button>
-            </form>
-            
-            <div id="qr-result" class="hidden">
-                <h3>Customer QR Code</h3>
-                <div id="qr-code"></div>
-                <p>Scan this QR code at checkout to earn points!</p>
-                <button id="download-qr">Download QR Code</button>
-                <div class="customer-info">
-                    <p><strong>Name:</strong> <span id="display-name"></span></p>
-                    <p><strong>Phone:</strong> <span id="display-phone"></span></p>
-                    <p><strong>Points:</strong> <span id="display-points">0</span>/10</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Scan Tab -->
-        <div id="scan" class="tab-content">
-            <h2>Scan Customer QR Code</h2>
-            <div class="scanner-container">
-                <div id="scanner">
-                    <video id="scanner-video" width="300" height="300" playsinline></video>
-                    <canvas id="scanner-canvas" class="hidden"></canvas>
-                </div>
-                <button id="start-scan">Start Scanner</button>
-                <button id="stop-scan" class="hidden">Stop Scanner</button>
-                <div id="scanner-status">Camera not active</div>
-            </div>
-            
-            <div id="scan-result" class="hidden">
-                <h3>Customer Found</h3>
-                <div class="customer-info">
-                    <p><strong>Name:</strong> <span id="scan-name"></span></p>
-                    <p><strong>Phone:</strong> <span id="scan-phone"></span></p>
-                    <p><strong>Points:</strong> <span id="scan-points"></span>/10</p>
-                    <p><strong>Last Visit:</strong> <span id="scan-last-visit"></span></p>
-                </div>
-                <button id="add-point">Add Point</button>
-                <div id="reward-message" class="hidden reward">
-                    🎉 Customer earned a free item! Points reset to 0.
+                
+                <div class="cart-container">
+                    <h2><i class="fas fa-shopping-cart"></i> Cart</h2>
+                    <div id="cart-items">
+                        <!-- Cart items will be loaded here -->
+                    </div>
+                    <div class="cart-total">
+                        <p>Total: <span id="cart-total">0</span> RWF</p>
+                    </div>
+                    <div class="payment-options">
+                        <label><input type="radio" name="payment" value="cash" checked> <i class="fas fa-money-bill-wave"></i> Cash</label>
+                        <label><input type="radio" name="payment" value="momo"> <i class="fas fa-mobile-alt"></i> MoMo</label>
+                    </div>
+                    <button id="checkout-btn" class="btn" disabled><i class="fas fa-check-circle"></i> Checkout</button>
+                    <div id="shift-closed-alert" class="alert alert-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i> Cannot checkout - shift is not started!
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Customers Tab -->
-        <div id="customers" class="tab-content">
-            <h2>Customer Database</h2>
-            <div class="search-container">
-                <input type="text" id="search-customers" placeholder="Search by name or phone...">
-                <button id="export-data">Export Data</button>
-                <button id="clear-data">Clear All Data</button>
+
+            <!-- Receipts Tab -->
+            <div id="receipts" class="tab-content">
+                <h2><i class="fas fa-receipt"></i> Recent Receipts</h2>
+                <div class="date-filter">
+                    <input type="date" id="receipt-date-filter">
+                    <button id="filter-receipts-btn" class="btn"><i class="fas fa-filter"></i> Filter</button>
+                </div>
+                <div id="receipts-list">
+                    <!-- Receipts will be loaded here -->
+                </div>
             </div>
-            <div class="table-container">
-                <table id="customers-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Points</th>
-                            <th>Last Visit</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Customer data will be inserted here -->
-                    </tbody>
-                </table>
+       
+<div id="summary" class="tab-content">
+    <h2><i class="fas fa-chart-bar"></i> Sales Summary</h2>
+    <div class="date-range">
+        <input type="date" id="start-date">
+        <span>to</span>
+        <input type="date" id="end-date">
+        <button id="filter-summary-btn" class="btn"><i class="fas fa-filter"></i> Filter</button>
+        <button id="whatsapp-summary-btn" class="btn" style="background-color: #25D366;"><i class="fab fa-whatsapp"></i> Send Summary</button>
+    </div>
+    <div id="summary-content">
+        <!-- Summary will be loaded here -->
+    </div>
+</div>
+
+            <!-- Stock Management Tab -->
+            <div id="stock" class="tab-content">
+                <h2><i class="fas fa-boxes"></i> Stock Management</h2>
+                <div class="stock-form">
+                    <input type="text" id="item-name" placeholder="Item Name">
+                    <input type="number" id="item-price" placeholder="Price (RWF)" min="0" step="1">
+                    <input type="text" id="item-quantity" placeholder="Quantity (or 'unlimited')">
+                    <small style="display: block; margin-top: -10px; margin-bottom: 10px; color: #666;">
+                        Enter a number or "unlimited" for items that don't need stock tracking
+                    </small>
+                    <button id="add-item-btn" class="btn"><i class="fas fa-plus"></i> Add Item</button>
+                </div>
+                <div class="stock-alerts" id="low-stock-alerts">
+                    <!-- Low stock alerts will appear here -->
+                </div>
+                <div id="stock-items">
+                    <!-- Stock items will be loaded here -->
+                </div>
             </div>
+
+            <!-- Shift Management Tab -->
+            <div id="shift" class="tab-content">
+                <h2><i class="fas fa-user-clock"></i> Shift Management</h2>
+                <div id="shift-controls">
+                    <button id="start-shift-btn" class="btn"><i class="fas fa-play"></i> Start Shift</button>
+                    <button id="end-shift-btn" class="btn" disabled><i class="fas fa-stop"></i> End Shift</button>
+                </div>
+                <div id="shift-summary">
+                    <!-- Shift summary will be loaded here -->
+                </div>
+                <div id="whatsapp-section" style="display: none;">
+                    <button id="send-whatsapp-btn" class="btn"><i class="fab fa-whatsapp"></i> Send Summary via WhatsApp</button>
+                </div>
+            </div>
+     <!-- Expenses Tab -->
+<div id="expenses" class="tab-content">
+    <h2><i class="fas fa-receipt"></i> Expense Tracking</h2>
+    <div class="expense-form">
+        <input type="text" id="expense-name" placeholder="Expense Name">
+        <input type="number" id="expense-amount" placeholder="Amount (RWF)" min="0">
+        <textarea id="expense-notes" placeholder="Notes (optional)"></textarea>
+        <button id="add-expense-btn" class="btn"><i class="fas fa-plus"></i> Add Expense</button>
+    </div>
+    <div id="expenses-list">
+        <!-- Expenses will be loaded here -->
+    </div>
+</div>
+   </main>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receipt-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="receipt-content">
+                <!-- Receipt content will be loaded here -->
+            </div>
+            <button id="copy-receipt-btn" class="btn"><i class="fas fa-copy"></i> Copy Receipt</button>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed: ', err));
+            });
+        }
+    </script>
+    // Logout functionality
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('pinAuthenticated');
+            window.location.href = 'pin.html';
+        }
+    });
+</script>
 </body>
 </html>
