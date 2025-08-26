@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Bakes POS - PIN Access</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* PIN-specific styles */
+        .pin-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .pin-box {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center;
+            color: var(--white);
+        }
+
+        .pin-logo {
+            margin-bottom: 20px;
+        }
+
+        .pin-logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .pin-logo p {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .pin-display {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            letter-spacing: 10px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .pin-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pin-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 24px;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .pin-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .pin-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .pin-action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .pin-action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pin-clear-btn {
+            background: rgba(239, 35, 60, 0.7);
+            color: var(--white);
+        }
+
+        .pin-clear-btn:hover {
+            background: rgba(239, 35, 60, 0.9);
+        }
+
+        .pin-enter-btn {
+            background: rgba(76, 201, 240, 0.7);
+            color: var(--white);
+        }
+
+        .pin-enter-btn:hover {
+            background: rgba(76, 201, 240, 0.9);
+        }
+
+        .pin-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .pin-error {
+            background: rgba(239, 35, 60, 0.2);
+            color: #ff6b6b;
+            display: block;
+        }
+
+        .pin-success {
+            background: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
+            display: block;
+        }
+
+        .pin-locked {
+            background: rgba(247, 127, 0, 0.2);
+            color: #f77f00;
+            display: block;
+        }
+
+        .pin-attempts {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 480px) {
+            .pin-box {
+                padding: 20px;
+            }
+            
+            .pin-btn {
+                padding: 12px;
+                font-size: 20px;
+            }
+            
+            .pin-action-btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pin-container">
+        <div class="pin-box">
+            <div class="pin-logo">
+                <h1>Royal Bakes POS</h1>
+                <p>Enter PIN to continue</p>
+            </div>
+            
+            <div class="pin-display" id="pin-display">Enter PIN</div>
+            
+            <div class="pin-pad">
+                <button class="pin-btn" data-number="1">1</button>
+                <button class="pin-btn" data-number="2">2</button>
+                <button class="pin-btn" data-number="3">3</button>
+                <button class="pin-btn" data-number="4">4</button>
+                <button class="pin-btn" data-number="5">5</button>
+                <button class="pin-btn" data-number="6">6</button>
+                <button class="pin-btn" data-number="7">7</button>
+                <button class="pin-btn" data-number="8">8</button>
+                <button class="pin-btn" data-number="9">9</button>
+                <button class="pin-btn" id="pin-btn-clear">C</button>
+                <button class="pin-btn" data-number="0">0</button>
+                <button class="pin-btn" id="pin-btn-backspace">⌫</button>
+            </div>
+            
+            <div class="pin-action-buttons">
+                <button class="pin-action-btn pin-clear-btn" id="pin-btn-clear-all">Clear All</button>
+                <button class="pin-action-btn pin-enter-btn" id="pin-btn-enter">Enter</button>
+            </div>
+            
+            <div class="pin-message" id="pin-message"></div>
+            <div class="pin-attempts" id="pin-attempts"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Change this PIN as needed
+        const CORRECT_PIN = "2024";
+        const MAX_ATTEMPTS = 4;
+        const LOCKOUT_MINUTES = 30;
+        
+        // State variables
+        let enteredPIN = "";
+        let attempts = 0;
+        let isLocked = false;
+        let lockUntil = null;
+        
+        // DOM elements
+        const pinDisplay = document.getElementById('pin-display');
+        const messageEl = document.getElementById('pin-message');
+        const attemptsEl = document.getElementById('pin-attempts');
+        const enterBtn = document.getElementById('pin-btn-enter');
+        const clearAllBtn = document.getElementById('pin-btn-clear-all');
+        const clearBtn = document.getElementById('pin-btn-clear');
+        const backspaceBtn = document.getElementById('pin-btn-backspace');
+        
+        // Initialize from localStorage if available
+        function initializeAuth() {
+            const savedAttempts = localStorage.getItem('pinAttempts');
+            const savedLockUntil = localStorage.getItem('pinLockUntil');
+            
+            if (savedAttempts) attempts = parseInt(savedAttempts);
+            if (savedLockUntil) lockUntil = parseInt(savedLockUntil);
+            
+            checkLockStatus();
+            updateAttemptsDisplay();
+        }
+        
+        // Check if system is currently locked
+        function checkLockStatus() {
+            if (lockUntil && Date.now() < lockUntil) {
+                isLocked = true;
+                const minutesLeft = Math.ceil((lockUntil - Date.now()) / 60000);
+                showMessage(`System locked. Try again in ${minutesLeft} minutes.`, 'locked');
+                disableInput();
+            } else if (lockUntil && Date.now() >= lockUntil) {
+                // Lock period expired
+                isLocked = false;
+                lockUntil = null;
+                attempts = 0;
+                localStorage.removeItem('pinLockUntil');
+                localStorage.removeItem('pinAttempts');
+                enableInput();
+            }
+            
+            updateAttemptsDisplay();
+        }
+        
+        // Update the attempts display
+        function updateAttemptsDisplay() {
+            if (attempts > 0) {
+                attemptsEl.textContent = `${MAX_ATTEMPTS - attempts} attempts remaining`;
+            } else {
+                attemptsEl.textContent = '';
+            }
+        }
+        
+        // Show message with specific type (error, success, locked)
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = 'pin-message';
+            messageEl.classList.add('pin-' + type);
+        }
+        
+        // Clear message
+        function clearMessage() {
+            messageEl.textContent = '';
+            messageEl.className = 'pin-message';
+        }
+        
+        // Disable all input
+        function disableInput() {
+            document.querySelectorAll('.pin-btn, .pin-action-btn').forEach(btn => {
+                if (btn.id !== 'pin-btn-clear' && btn.id !== 'pin-btn-backspace') {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                }
+            });
+        }
+        
+        // Enable all input
+        function enableInput() {
+            document.querySelectorAll('.pin-btn, .pin-action-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            });
+        }
+        
+        // Add digit to PIN
+        function addDigit(digit) {
+            if (enteredPIN.length < 4) {
+                enteredPIN += digit;
+                updatePinDisplay();
+            }
+        }
+        
+        // Clear last digit
+        function clearLastDigit() {
+            if (enteredPIN.length > 0) {
+                enteredPIN = enteredPIN.slice(0, -1);
+                updatePinDisplay();
+            }
+        }
+        
+        // Clear all digits
+        function clearAllDigits() {
+            enteredPIN = "";
+            updatePinDisplay();
+            clearMessage();
+        }
+        
+        // Update the PIN display with asterisks
+        function updatePinDisplay() {
+            if (enteredPIN.length === 0) {
+                pinDisplay.textContent = 'Enter PIN';
+            } else {
+                pinDisplay.textContent = '*'.repeat(enteredPIN.length);
+            }
+        }
+        
+        // Verify the entered PIN
+        function verifyPIN() {
+            if (enteredPIN.length < 4) {
+                showMessage('Please enter a 4-digit PIN', 'error');
+                return;
+            }
+            
+            if (enteredPIN === CORRECT_PIN) {
+                // Successful login
+                showMessage('Access granted! Redirecting...', 'success');
+                attempts = 0;
+                localStorage.removeItem('pinAttempts');
+                
+                // Set authentication flag and redirect to POS
+                localStorage.setItem('pinAuthenticated', 'true');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                // Failed attempt
+                attempts++;
+                localStorage.setItem('pinAttempts', attempts);
+                
+                if (attempts >= MAX_ATTEMPTS) {
+                    // Lock the system
+                    lockUntil = Date.now() + (LOCKOUT_MINUTES * 60 * 1000);
+                    localStorage.setItem('pinLockUntil', lockUntil);
+                    isLocked = true;
+                    showMessage(`Too many failed attempts. System locked for ${LOCKOUT_MINUTES} minutes.`, 'locked');
+                    disableInput();
+                } else {
+                    showMessage('Incorrect PIN. Please try again.', 'error');
+                    // Clear the PIN for security
+                    setTimeout(() => {
+                        enteredPIN = "";
+                        updatePinDisplay();
+                    }, 1000);
+                }
+                
+                updateAttemptsDisplay();
+            }
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Number buttons
+            document.querySelectorAll('.pin-btn[data-number]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (!isLocked) {
+                        addDigit(btn.getAttribute('data-number'));
+                    }
+                });
+            });
+            
+            // Clear button (single digit)
+            clearBtn.addEventListener('click', () => {
+                if (!isLocked) clearLastDigit();
+            });
+            
+            // Backspace button
+            backspaceBtn.addEventListener('click', () => {
+                if (!isLocked) clearLastDigit();
+            });
+            
+            // Clear All button
+            clearAllBtn.addEventListener('click', () => {
+                if (!isLocked) clearAllDigits();
+            });
+            
+            // Enter button
+            enterBtn.addEventListener('click', () => {
+                if (!isLocked) verifyPIN();
+            });
+            
+            // Keyboard support
+            document.addEventListener('keydown', (e) => {
+                if (isLocked) return;
+                
+                if (e.key >= '0' && e.key <= '9' && enteredPIN.length < 4) {
+                    addDigit(e.key);
+                } else if (e.key === 'Backspace') {
+                    clearLastDigit();
+                } else if (e.key === 'Enter') {
+                    verifyPIN();
+                } else if (e.key === 'Escape') {
+                    clearAllDigits();
+                }
+            });
+        }
+        
+        // Initialize the PIN pad
+        function initPinPad() {
+            initializeAuth();
+            setupEventListeners();
+            updatePinDisplay();
+        }
+        
+        // Start everything when page loads
+        document.addEventListener('DOMContentLoaded', initPinPad);
+        
+        // Check lock status every minute
+        setInterval(checkLockStatus, 60000);
+    </script>
+</body>
+</html>
